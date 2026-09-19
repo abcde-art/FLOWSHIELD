@@ -1,0 +1,158 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\ADMIN\Desktop\Flood\flowshield
+plugins: anyio-4.15.1
+collected 169 items
+
+tests\test_config.py ..........................                          [ 15%]
+tests\test_conservation.py .....FFF.....FFFF.............                [ 33%]
+tests\test_forecasting.py .......................                        [ 46%]
+tests\test_risk.py .......................                               [ 60%]
+tests\test_scenarios.py .........F......                                 [ 69%]
+tests\test_simulation.py .........F......                                [ 79%]
+tests\test_terrain.py ...................................                [100%]
+
+================================== FAILURES ===================================
+______________ TestMassConservationFull.test_zero_rain_conserves ______________
+tests\test_conservation.py:101: in test_zero_rain_conserves
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 3 validation errors for SimulationConfig
+E   drainage.base_drainage_rate_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=0, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.base_intensity_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=0, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.duration_minutes
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=0, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+_____________ TestMassConservationFull.test_no_drainage_scenario ______________
+tests\test_conservation.py:114: in test_no_drainage_scenario
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 5 validation errors for SimulationConfig
+E   grid.rows
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=10, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   grid.cols
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=10, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   drainage.base_drainage_rate_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=0, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.base_intensity_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=20, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.duration_minutes
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=10, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+__________ TestMassConservationPerStep.test_conservation_every_step ___________
+tests\test_conservation.py:136: in test_conservation_every_step
+    engine = _make_engine(
+tests\test_conservation.py:54: in _make_engine
+    config = config or _default_config(**kw)
+                       ^^^^^^^^^^^^^^^^^^^^^
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 3 validation errors for SimulationConfig
+E   grid.rows
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=15, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   grid.cols
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=15, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   time
+E     Extra inputs are not permitted [type=extra_forbidden, input_value={'timestep_minutes': 1, 'duration_minutes': 30}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+______________ TestNoUphillInflow.test_full_simulation_no_uphill ______________
+tests\test_conservation.py:231: in test_full_simulation_no_uphill
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 3 validation errors for SimulationConfig
+E   grid.rows
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=15, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   grid.cols
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=15, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   time
+E     Extra inputs are not permitted [type=extra_forbidden, input_value={'timestep_minutes': 1, 'duration_minutes': 20}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+_________________ TestRainfallModule.test_mm_to_m_conversion __________________
+tests\test_conservation.py:256: in test_mm_to_m_conversion
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for SimulationConfig
+E   rainfall.base_intensity_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=60, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.duration_minutes
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=10, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+______________ TestRainfallModule.test_no_rain_after_event_ends _______________
+tests\test_conservation.py:265: in test_no_rain_after_event_ends
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for SimulationConfig
+E   rainfall.base_intensity_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=60, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.duration_minutes
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=5, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+______________ TestRainfallModule.test_surge_multiplier_applied _______________
+tests\test_conservation.py:273: in test_surge_multiplier_applied
+    cfg = _default_config(
+tests\test_conservation.py:50: in _default_config
+    return SimulationConfig.model_validate(overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 6 validation errors for SimulationConfig
+E   rainfall.base_intensity_mm_hr
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=20, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.duration_minutes
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=60, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.surge_enabled
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=True, input_type=bool]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.surge_start_minute
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=10, input_type=int]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   rainfall.surge_multiplier
+E     Extra inputs are not permitted [type=extra_forbidden, input_value=3.0, input_type=float]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   time
+E     Extra inputs are not permitted [type=extra_forbidden, input_value={'timestep_minutes': 1, 'duration_minutes': 60}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+__ TestScenarioDifferences.test_drainage_failure_has_more_water_than_normal ___
+tests\test_scenarios.py:81: in test_drainage_failure_has_more_water_than_normal
+    assert drain_vol > normal_vol
+E   assert np.float64(0.0) > np.float64(0.0)
+__ TestScenarioDifferences.test_drainage_failure_has_more_water_than_normal ___
+tests\test_scenarios.py:81: in test_drainage_failure_has_more_water_than_normal
+    assert drain_vol > normal_vol
+E   assert np.float64(0.0) > np.float64(0.0)
+=========================== short test summary info ===========================
+FAILED tests/test_conservation.py::TestMassConservationFull::test_zero_rain_conserves
+FAILED tests/test_conservation.py::TestMassConservationFull::test_no_drainage_scenario
+FAILED tests/test_conservation.py::TestMassConservationPerStep::test_conservation_every_step
+FAILED tests/test_conservation.py::TestNoUphillInflow::test_full_simulation_no_uphill
+FAILED tests/test_conservation.py::TestRainfallModule::test_mm_to_m_conversion
+FAILED tests/test_conservation.py::TestRainfallModule::test_no_rain_after_event_ends
+FAILED tests/test_conservation.py::TestRainfallModule::test_surge_multiplier_applied
+FAILED tests/test_scenarios.py::TestScenarioDifferences::test_drainage_failure_has_more_water_than_normal
+FAILED tests/test_simulation.py::TestScenarioDifferences::test_drainage_failure_has_more_water_than_normal
+======================== 9 failed, 160 passed in 1.93s ========================

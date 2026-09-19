@@ -1,0 +1,41 @@
+{
+    "name": "Blocked Culvert",
+    "grid": {
+        "width": 30,
+        "height": 30,
+        "cell_size_m": 10.0
+    },
+    "terrain": {
+        "seed": 42,
+        "base_elevation_m": 10.0,
+        "amplitude_m": 5.0,
+        "roughness": 0.5,
+        "valley_depth_m": 5.0
+    },
+    "population": {
+        "seed": 42,
+        "mean": 100.0,
+        "std": 20.0,
+        "max": 1000.0
+    },
+    "drainage": {
+        "seed": 42,
+        "base_capacity_m3_per_h": 0.5,
+        "variability": 0.1
+    },
+    "rainfall": {
+        "duration_h": 1.25,
+        "rate_mm_per_h": 40.0,
+        "peak_multiplier": 3.0,
+        "peak_time_fraction": 0.5
+    },
+    "simulation": {
+        "timestep_min": 1.0,
+        "duration_h": 2.0,
+        "flow_coefficient": 0.45
+    },
+    "risk": {
+        "warning_depth_m": 0.05,
+        "critical_depth_m": 0.15
+    }
+}
