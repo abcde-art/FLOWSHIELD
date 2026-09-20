@@ -227,6 +227,65 @@ def run_simulation(config_json: str, blocked: tuple) -> dict:
     )
 
 
+@st.cache_data(show_spinner="Fetching real-world data & running simulation ...")
+def run_simulation_api(config_json: str, blocked: tuple, lat: float, lon: float) -> dict:
+    """Run simulation using real-world data from APIs."""
+    cfg = SimulationConfig.model_validate(json.loads(config_json))
+    from flowshield.data.loader import build_city_from_api
+    from flowshield.data.api_data import fetch_rainfall
+
+    try:
+        real_rain = fetch_rainfall(lat, lon, cfg.simulation.duration_h)
+        # Override config with real rain data
+        cfg.rainfall.rate_mm_per_h = real_rain["rate_mm_per_h"]
+        cfg.rainfall.duration_h = real_rain["duration_h"]
+        cfg.rainfall.peak_multiplier = real_rain["peak_multiplier"]
+        cfg.rainfall.peak_time_fraction = real_rain["peak_time_fraction"]
+    except Exception as e:
+        import streamlit as st
+        st.sidebar.warning(f"Rainfall API failed ({e}). Using synthetic rainfall.")
+        real_rain = {
+            "rate_mm_per_h": cfg.rainfall.rate_mm_per_h,
+            "duration_h": cfg.rainfall.duration_h,
+            "peak_multiplier": cfg.rainfall.peak_multiplier,
+            "peak_time_fraction": cfg.rainfall.peak_time_fraction,
+        }
+
+    grid = build_city_from_api(lat, lon, cfg)
+
+    mask = _make_blockage_mask(cfg.grid.height, cfg.grid.width, blocked)
+    engine = SimulationEngine(cfg, grid, blockage_mask=mask)
+
+    snapshots: List[np.ndarray] = [grid.water_depth.copy()]
+    for _ in range(engine.num_steps):
+        engine.step()
+        snapshots.append(grid.water_depth.copy())
+
+    cons = check_mass_conservation(engine)
+
+    return dict(
+        elevation=grid.elevation,
+        population=grid.population,
+        drainage_capacity=grid.drainage_capacity,
+        snapshots=snapshots,
+        rain_hist=list(engine.audit.rain_added_history),
+        drain_hist=list(engine.audit.water_drained_history),
+        vol_hist=list(engine.audit.total_water_volume_history),
+        init_vol=engine.initial_water_volume,
+        num_steps=engine.num_steps,
+        dt=cfg.simulation.timestep_min,
+        warn_th=cfg.risk.warning_depth_m,
+        crit_th=cfg.risk.critical_depth_m,
+        cons_pass=cons.passed,
+        cons_err=cons.absolute_error,
+        name=cfg.name,
+        api_rainfall=real_rain,
+        data_source="api",
+        lat=lat,
+        lon=lon,
+    )
+
+
 @st.cache_data(show_spinner="Comparing scenarios ...")
 def compare_scenarios() -> Dict[str, Dict[str, Any]]:
     """Run all four preset scenarios and return summary metrics."""
@@ -271,6 +330,28 @@ if "_prev_scenario" not in st.session_state:
 
 with st.sidebar:
     st.markdown("## :shield: Scenario Configuration")
+
+    # ── Data Source Toggle ────────────────────────────────────────────────
+    data_source = st.radio(
+        "📡 Data Source",
+        ["Synthetic", "Real-World API"],
+        index=0,
+        key="data_source",
+        horizontal=True,
+        help="Synthetic uses procedural generation. Real-World API fetches live terrain, weather, and population data.",
+    )
+    use_api = data_source == "Real-World API"
+
+    if use_api:
+        st.markdown("##### 🌍 Location (Lat / Lon)")
+        api_col1, api_col2 = st.columns(2)
+        with api_col1:
+            api_lat = st.number_input("Latitude", value=28.6139, format="%.4f", key="api_lat")
+        with api_col2:
+            api_lon = st.number_input("Longitude", value=77.2090, format="%.4f", key="api_lon")
+        st.caption("Default: New Delhi. Try Mumbai (19.0760, 72.8777) or Chennai (13.0827, 80.2707).")
+
+    st.divider()
 
     scenario = st.selectbox("Scenario Preset", SCENARIO_LABELS, key="scenario_sel")
 
@@ -359,7 +440,16 @@ cfg_dict["drainage"]["base_capacity_m3_per_h"] = drain_mm
 cfg_dict["risk"]["warning_depth_m"] = float(st.session_state.get("s_warn", 0.10))
 cfg_dict["risk"]["critical_depth_m"] = float(st.session_state.get("s_crit", 0.30))
 cfg_json = json.dumps(cfg_dict, sort_keys=True)
-sim = run_simulation(cfg_json, tuple(sorted(blocked)))
+
+if use_api:
+    try:
+        sim = run_simulation_api(cfg_json, tuple(sorted(blocked)), api_lat, api_lon)
+        st.sidebar.success(f"📡 API Data loaded for ({api_lat:.4f}, {api_lon:.4f}) (with synthetic fallbacks if needed).")
+    except RuntimeError as e:
+        st.sidebar.error(f"API Error: {e}\n\nFalling back to synthetic data.")
+        sim = run_simulation(cfg_json, tuple(sorted(blocked)))
+else:
+    sim = run_simulation(cfg_json, tuple(sorted(blocked)))
 
 # ── Convenience aliases ───────────────────────────────────────────────────
 elevation = sim["elevation"]

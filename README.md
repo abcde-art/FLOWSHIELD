@@ -11,10 +11,12 @@ Paired with a Streamlit and Plotly interactive operations dashboard, it enables 
 
 - **Python**: Core programming language.
 - **NumPy**: Vectorized grid calculations and high-performance hydrological simulation.
+- **SciPy**: Bilinear interpolation and scaling of spatial datasets.
 - **Streamlit**: Interactive web application framework for the operations dashboard.
 - **Plotly**: Interactive 2D heatmaps and 3D terrain/flood visualizations.
 - **Pydantic**: Strong typing, data validation, and configuration management.
 - **Pytest**: Unit testing framework verifying mass-conservation and physics logic.
+- **Requests**: HTTP library for fetching real-world data from external APIs (Open-Meteo, WorldPop).
 
 ---
 ## 🏗 Architecture & Data Flow
